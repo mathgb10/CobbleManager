@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Cobbleverse Gonbene</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/login.js" defer></script>
+
+    <!-- EXTERNO: BOOSTRAPICONS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <main class="main-content">
+        <form class="login-form">
+            <div class="header-form">
+                <h2>Login</h2>
+            </div>
+            <div class="body-form">
+                <div class="input-box">
+                    <label for="usuario">Nome:</label>
+                    <input type="text" name="usuario" id="usuario">
+                </div>
+                <div class="input-box">
+                    <label for="senha">Senha:</label>
+                    <input type="password" name="senha" id="senha">
+                    <button type="button" onclick="viewPass()" id="view-pass"><i class="bi bi-eye-slash"></i></button>
+                </div>
+            </div>
+            <div class="footer-form">
+                <button type="submit" class="confirmar">Entrar<i class="bi bi-box-arrow-in-right"></i></button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
