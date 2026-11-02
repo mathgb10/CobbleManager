@@ -61,18 +61,12 @@ async def login(usuario:Login, request: Request):
                 "msg":"O login foi realizado com sucesso."
             }
         else:
-            return {
-                "login":"false",
-                "msg":"Senha incorreta."
-            }
+            raise HTTPException(status_code=401, detail="Senha incorreta.")
     else:
-        return {
-            "login":"false",
-            "msg":"Usuário incorreto."
-        }
+        raise HTTPException(status_code=401, detail="Usuário incorreto.")
 
 # Logout
-@app.post("/api/auth/login")
+@app.post("/api/auth/logout")
 async def logout(request: Request):
     # Limpo a sessão
     request.session.clear()

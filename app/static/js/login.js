@@ -19,7 +19,7 @@ document.querySelector(".login-form").addEventListener("submit", async (e)=>{
     const p = document.getElementById("senha").value;
 
     try {
-        const resp = await fetch("/api/auth/me",{
+        const resp = await fetch("/api/auth/login",{
             method: 'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -29,7 +29,18 @@ document.querySelector(".login-form").addEventListener("submit", async (e)=>{
                 senha: p
             })
         })
+
+        if (!resp.ok){
+            const errorData = await resp.json();
+            alert(errorData.detail);
+            return;
+        }
+
+        const dados = await resp.json();
+
+        window.location.href = "/";
     } catch (error){
-        return error;
+        console.log("Error: ",error);
+        alert("Erro ao tentar logar.");
     }
 })
