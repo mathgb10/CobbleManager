@@ -1,82 +1,37 @@
-
-const usernameElement = document.getElementById('admin-username');
-
-const statusElement = document.getElementById('server-status');
-const playersElement = document.getElementById('server-players');
-const tpsElement = document.getElementById('server-tps');
-
-const logoutButton = document.getElementById('logout-button');
-
-
-async function verificarSessao() {
-
-    const resposta = await fetch('/api/auth/me', {
-        credentials: 'same-origin'
-    });
-
-    if (!resposta.ok) {
-        window.location.href = '/login';
-        return false;
-    }
-
-    const usuario = await resposta.json();
-
-    usernameElement.textContent = usuario.username;
-
-    return true;
+function atualizarRelogio() {
+  const agora = new Date();
+  
+  const h = agora.getHours().toString().padStart(2, '0');
+  const m = agora.getMinutes().toString().padStart(2, '0');
+  const s = agora.getSeconds().toString().padStart(2, '0');
+  
+  const horarioFormatado = `${h}:${m}:${s}`;
+  document.getElementById('relogio').innerText = horarioFormatado;
 }
 
+// Atualiza o relógio a cada 1000ms (1 segundo)
+setInterval(atualizarRelogio, 1000);
 
-async function carregarStatusServidor() {
+// Executa imediatamente ao carregar a página
+atualizarRelogio();
 
+// Ao clicar no botão de logout, chamo a função de encerrar sessão
+document.getElementById("logout-btn").addEventListener("click", async () => {
     try {
-
-        const resposta = await fetch('/api/server/status', {
-            credentials: 'same-origin'
-        });
-
-        if (!resposta.ok) {
-            throw new Error('Não foi possível consultar o servidor.');
+        const resp = await fetch("/api/auth/logout",{
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json'
+            }
+        })
+        
+        if (!resp.ok) {
+            alerta("Erro ao tentar realizar o logout.");
         }
 
-        const dados = await resposta.json();
-
-        statusElement.textContent = dados.status;
-        playersElement.textContent = dados.players ?? '--';
-        tpsElement.textContent = dados.tps ?? '--';
-
+        window.location.href = "/";
     } catch (error) {
-
-        statusElement.textContent = 'Indisponível';
-        console.error(error);
-
+        console.log("Error: ", error);
+        alert("Erro ao tentar deslogar.");
     }
-}
-
-
-async function logout() {
-
-    const resposta = await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'same-origin'
-    });
-
-    if (resposta.ok) {
-        window.location.href = '/login';
-    }
-
-}
-
-
-logoutButton.addEventListener('click', logout);
-
-
-document.addEventListener('DOMContentLoaded', async () => {
-
-    const autenticado = await verificarSessao();
-
-    if (!autenticado) return;
-
-    await carregarStatusServidor();
-
-});
+})
