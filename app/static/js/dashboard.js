@@ -3,9 +3,8 @@ function atualizarRelogio() {
   
   const h = agora.getHours().toString().padStart(2, '0');
   const m = agora.getMinutes().toString().padStart(2, '0');
-  const s = agora.getSeconds().toString().padStart(2, '0');
   
-  const horarioFormatado = `${h}:${m}:${s}`;
+  const horarioFormatado = `${h}:${m}`;
   document.getElementById('relogio').innerText = horarioFormatado;
 }
 
@@ -79,7 +78,7 @@ function criarGraficoRam(usadoMb, limiteMb) {
             labels: ['Usado (MB)', 'Livre (MB)'],
             datasets: [{
                 data: [usadoMb, livreMb],
-                backgroundColor: ['#ff6384', '#36a2eb'],
+                backgroundColor: ['#ff0037', '#00ff66'],
                 borderWidth: 1
             }]
         },
@@ -131,8 +130,8 @@ function criarGraficoCpu(cpuPercentAtual) {
             datasets: [{
                 label: 'CPU %',
                 data: historicoCpu.dados,
-                borderColor: '#4bc0c0',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: '#00ff66',
+                backgroundColor: 'rgba(0, 255, 102, 0.2)',
                 borderWidth: 2,
                 fill: true,
                 tension: 0.3 // Deixa a linha curvada e suave
@@ -158,12 +157,16 @@ function criarGraficoCpu(cpuPercentAtual) {
 // Coloco na tela as informações
 async function setScreen(){
     const places = {
+        // Places de Sidebar
         dominio: document.getElementById("dominio"),
         atual_players: document.getElementById("atual_play"),
         max_players: document.getElementById("max_play"),
+        // Cards
         nome: document.getElementById("nome"),
         status: document.getElementById("status"),
-        saude: document.getElementById("saude")
+        saude: document.getElementById("saude"),
+        // Logs
+        logs: document.getElementById("logs")
     }
     const data = await getInfos('status');
 
@@ -180,6 +183,12 @@ async function setScreen(){
     // Gráficos
     criarGraficoRam(data.hardware.ram_used_mb, data.hardware.ram_limit_mb);
     criarGraficoCpu(data.hardware.cpu_percent);
+
+    // Logs
+    places.logs.innerHTML = null;
+    data.logs.forEach(e => {
+        places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
+    });
 }
 
 setInterval(setScreen, 5000);
