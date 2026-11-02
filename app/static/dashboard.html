@@ -7,13 +7,32 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="/static/js/dashboard.js" defer></script>
 
-    <!-- EXTERNO: BOOSTRAPICONS -->
+    <!-- EXTERNO: BOOSTRAPICONS, CHARTSJS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <main class="main-content">
         <aside class="sidebar">
-            <button id="logout-btn">Sair<i class="bi bi-box-arrow-in-left"></i></button>
+            <div class="sidebar-header">
+                <h2>Painel ADM</h2>
+                <h4 id="dominio"></h4>
+                <h5><span id="atual_play"></span>/<span id="max_play"></span></h5>
+            </div>
+            <div class="sidebar-links">
+                <button>
+                    Dashboard
+                </button>
+                <button>
+                    Painel
+                </button>
+                <button>
+                    Console
+                </button>
+            </div>
+            <div class="sidebar-footer">
+                <button id="logout-btn">Sair<i class="bi bi-box-arrow-in-left"></i></button>
+            </div>
         </aside>
         <header>
             <div>
@@ -23,6 +42,35 @@
                 00:00:00
             </div>
         </header>
+        <section class="content">
+            <div class="cards">
+                <div class="card">
+                    <h2>Nome</h2>
+                    <span id="nome">...</span>
+                </div>
+                <div class="card">
+                    <h2>Status</h2>
+                    <span id="status">...</span>
+                </div>
+                <div class="card">
+                    <h2>Saude</h2>
+                    <span id="saude">...</span>
+                </div>
+            </div>
+            <div class="hardware-cards">
+                <div class="card" style="width: 300px;">
+                    <h2>RAM</h2>
+                    <canvas id="ramChart"></canvas>
+                </div>
+                <div class="card" style="width: 300px;">
+                    <h2>CPU</h2>
+                    <canvas id="cpuChart"></canvas>
+                </div>
+            </div>
+            <div class="logs-card">
+                
+            </div>
+        <section>
     </main>
 </body>
 </html>
