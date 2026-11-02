@@ -1,29 +1,23 @@
 function atualizarRelogio() {
-  const agora = new Date();
-  
-  const h = agora.getHours().toString().padStart(2, '0');
-  const m = agora.getMinutes().toString().padStart(2, '0');
-  
-  const horarioFormatado = `${h}:${m}`;
-  document.getElementById('relogio').innerText = horarioFormatado;
+    const agora = new Date();
+
+    const h = agora.getHours().toString().padStart(2, '0');
+    const m = agora.getMinutes().toString().padStart(2, '0');
+
+    const horarioFormatado = `${h}:${m}`;
+    document.getElementById('relogio').innerText = horarioFormatado;
 }
-
-// Atualiza o relógio a cada 1000ms (1 segundo)
-setInterval(atualizarRelogio, 1000);
-
-// Executa imediatamente ao carregar a página
-atualizarRelogio();
 
 // Ao clicar no botão de logout, chamo a função de encerrar sessão
 document.getElementById("logout-btn").addEventListener("click", async () => {
     try {
-        const resp = await fetch("/api/auth/logout",{
+        const resp = await fetch("/api/auth/logout", {
             method: 'POST',
             headers: {
-                'Content-Type':'application/json'
+                'Content-Type': 'application/json'
             }
         })
-        
+
         if (!resp.ok) {
             alerta("Erro ao tentar realizar o logout.");
         }
@@ -36,14 +30,14 @@ document.getElementById("logout-btn").addEventListener("click", async () => {
 })
 
 // Função que da fetch na rota de API do servidor e retorna os dados
-async function getInfos(rota){
-    const api=`/api/server/${rota}`;
-    
+async function getInfos(rota) {
+    const api = `/api/server/${rota}`;
+
     try {
         const resp = await fetch(api)
 
-        if(!resp.ok) {
-            alert("Erro ao tentar consultar dados da rota: "+rota)
+        if (!resp.ok) {
+            alert("Erro ao tentar consultar dados da rota: " + rota)
             return;
         }
 
@@ -78,8 +72,8 @@ function criarGraficoRam(usadoMb, limiteMb) {
             labels: ['Usado (MB)', 'Livre (MB)'],
             datasets: [{
                 data: [usadoMb, livreMb],
-                backgroundColor: ['#ff0037', '#00ff66'],
-                borderWidth: 1
+                backgroundColor: ['rgba(0, 255, 102, 0.2)', '#00ff66'],
+                borderWidth: 0
             }]
         },
         options: {
@@ -101,7 +95,7 @@ const historicoCpu = {
 
 function criarGraficoCpu(cpuPercentAtual) {
     const ctx = document.getElementById('cpuChart').getContext('2d');
-    
+
     // Pega o horário atual para colocar no eixo X
     const agora = new Date().toLocaleTimeString();
 
@@ -154,42 +148,109 @@ function criarGraficoCpu(cpuPercentAtual) {
     });
 }
 
-// Coloco na tela as informações
-async function setScreen(){
+// Adiciono alguns valores a sidebar
+function setSidebar(v1, v2, v3) {
     const places = {
         // Places de Sidebar
         dominio: document.getElementById("dominio"),
         atual_players: document.getElementById("atual_play"),
-        max_players: document.getElementById("max_play"),
-        // Cards
-        nome: document.getElementById("nome"),
-        status: document.getElementById("status"),
-        saude: document.getElementById("saude"),
-        // Logs
-        logs: document.getElementById("logs")
+        max_players: document.getElementById("max_play")
     }
-    const data = await getInfos('status');
 
     // Sidebar
-    places.dominio.innerHTML = data.dominio
-    places.atual_players.innerHTML = data.jogadores.atual
-    places.max_players.innerHTML = data.jogadores.max
-
-    // Cards
-    places.nome.innerHTML = data.nome
-    places.status.innerHTML = data.status
-    places.saude.innerHTML = data.saude
-
-    // Gráficos
-    criarGraficoRam(data.hardware.ram_used_mb, data.hardware.ram_limit_mb);
-    criarGraficoCpu(data.hardware.cpu_percent);
-
-    // Logs
-    places.logs.innerHTML = null;
-    data.logs.forEach(e => {
-        places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
-    });
+    places.dominio.innerHTML = v1
+    places.atual_players.innerHTML = v2
+    places.max_players.innerHTML = v3
 }
 
-setInterval(setScreen, 5000);
-setScreen();
+// Coloco na tela as informações de acordo com a tela
+async function setScreen(tela) {
+    const data = await getInfos('status');
+    switch (tela) {
+        case 'dashboard':
+            document.querySelector(".content").innerHTML = `
+                <div class="cards">
+                    <div class="card card-nome">
+                        <h2>Nome</h2>
+                        <span id="nome">...</span>
+                    </div>
+                    <div class="card card-status">
+                        <h2>Status</h2>
+                        <span id="status">...</span>
+                    </div>
+                    <div class="card card-saude">
+                        <h2>Saude</h2>
+                        <span id="saude">...</span>
+                    </div>
+                </div>
+                <div class="hardware-cards">
+                    <div class="card grafico" style="width: 48%;">
+                        <h2>RAM</h2>
+                        <canvas id="ramChart"></canvas>
+                    </div>
+                    <div class="card grafico" style="width: 48%;">
+                        <h2>CPU</h2>
+                        <canvas id="cpuChart"></canvas>
+                    </div>
+                </div>
+                <div class="logs-box card">
+                    <div class="logs-header">
+                        <h2>Últimos Logs</h2>
+                    </div>
+                    <div class="logs-card" id="logs">
+                        ...
+                    </div>
+                </div>
+            `
+            const places = {
+                //Header
+                header: document.getElementById("pagina"),
+                // Cards
+                nome: document.getElementById("nome"),
+                status: document.getElementById("status"),
+                saude: document.getElementById("saude"),
+                // Logs
+                logs: document.getElementById("logs")
+            }
+
+            // Header
+            places.header.innerHTML = tela
+
+            // Cards
+            places.nome.innerHTML = data.nome
+            places.status.innerHTML = data.status
+            places.saude.innerHTML = data.saude
+
+            if (data.status == "running") {
+                document.querySelector(".card-status").classList.add("ok")
+            }
+
+            if (data.saude == "healthy") {
+                document.querySelector(".card-saude").classList.add("ok")
+            }
+
+            // Gráficos
+            criarGraficoRam(data.hardware.ram_used_mb, data.hardware.ram_limit_mb);
+            criarGraficoCpu(data.hardware.cpu_percent);
+
+            // Logs
+            places.logs.innerHTML = null;
+            data.logs.forEach(e => {
+                places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
+            });
+            break;
+        default:
+            break;
+    }
+
+    // Chamo a função que adicionara alguns valores a certos placeholders na sidebar
+    setSidebar(data.dominio, data.jogadores.atual, data.jogadores.max)
+}
+
+// Atualiza a tela com as informações
+setInterval(() => setScreen('dashboard'), 5000);
+setScreen('dashboard');
+
+// Atualiza o relógio a cada 1000ms (1 segundo)
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
