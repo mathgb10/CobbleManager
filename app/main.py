@@ -18,7 +18,6 @@ from pydantic import BaseModel
 # Docker
 import docker
 
-
 # Inicializa o cliente do Docker (ele conversa automaticamente com o Docker Desktop no Windows/Linux/Mac)
 try:
     docker_client = docker.from_env()
@@ -256,3 +255,24 @@ def enviar_comando(json: Comando, request: Request):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao enviar comando para o Docker: {str(e)}")
+
+@app.get("/api/server/logs")
+def terminal(request: Request):
+    if "usuario" not in request.session:
+        raise HTTPException(status_code=401, detail="Não autorizado.")
+
+    if docker_client is None:
+        raise HTTPException(status_code=500,detail="Cliente do Docker não disponível.")
+
+    try:
+        # Escolho o container
+        container = docker_client.containers.get("cobbleverse")
+        container.reload()
+        # Logs
+        logs_brutos = container.logs(tail=100, timestamps=False).decode("utf-8").splitlines()
+        return {
+            "logs": logs_brutos,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500,detail="Erro ao consultar logs")
+    

@@ -165,14 +165,14 @@ function setSidebar(v1, v2, v3) {
 
 // Adiciono os dados em seus placeholders
 async function setContent(tela) {
-    const data = await getInfos('status');
+    let data;
 
     // Chamo a função que adicionara alguns valores a certos placeholders na sidebar
-    setSidebar(data.dominio, data.jogadores.atual, data.jogadores.max)
-
     switch (tela) {
         case 'dashboard':
-            const places = {
+            data = await getInfos('status');
+            setSidebar(data.dominio, data.jogadores.atual, data.jogadores.max)
+            var places = {
                 //Header
                 header: document.getElementById("pagina"),
                 // Cards
@@ -209,7 +209,18 @@ async function setContent(tela) {
                 places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
             });
             break;
+        case 'console':
+            data = await getInfos('logs')
+            var places = {
+                // Logs
+                logs: document.getElementById("logs")
+            }
 
+            data.logs.forEach(e=>{
+                places.logs.innerHTML =  places.logs.innerHTML += `<p>${e}</p>`;
+            })
+            
+            break;
         default:
             break;
     }
@@ -256,6 +267,29 @@ async function setScreen(tela) {
                 </div>
             `
             break;
+        case 'console':
+            // Header
+            document.getElementById("pagina").innerHTML = tela;
+            document.querySelector(".content").innerHTML = `
+                <div class="logs-box terminal card">
+                    <div class="logs-header">
+                        <h2>Terminal</h2>
+                    </div>
+                    <div class="overflow">
+                        <div class="logs-card" id="logs">
+                        ...
+                        </div>
+                    </div>
+                    <form class="form">
+                        <div class="body-form">
+                            <label for="comando">></label>
+                            <div class="input-box">
+                                <input class="input" type="text" name="comando" id="comando"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            `
         default:
             break;
     }
@@ -278,7 +312,6 @@ function getRoute() {
             e.classList.remove("ativo");
         };
     });
-    console.log(tela1);
     setScreen(tela1);
     setContent(tela1);
 

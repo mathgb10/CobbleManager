@@ -189,12 +189,13 @@ button {
             overflow-wrap: break-word;
         }
 
-        #atual_play{
+        #atual_play {
             color: var(--confirm);
         }
     }
 
-    .sidebar-links, .sidebar-footer {
+    .sidebar-links,
+    .sidebar-footer {
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -313,7 +314,8 @@ button {
                 background: rgba(0, 255, 102, 0.2);
 
             }
-            .ok h2{
+
+            .ok h2 {
                 border-color: var(--text);
             }
 
@@ -335,7 +337,7 @@ button {
             gap: 15px;
             text-transform: capitalize;
             background: rgba(255, 255, 255, 0.01);
-            
+
             h2 {
                 border-bottom: 1px solid var(--border);
                 font-size: 16px;
@@ -348,6 +350,59 @@ button {
                 flex-direction: column;
                 gap: 3px;
                 color: var(--confirm);
+            }
+        }
+
+        .terminal {
+            height: 90vh;
+
+            .overflow {
+                overflow: auto;
+            }
+
+            .form {
+                .body-form {
+                    border: 1px solid var(--border);
+                    background-color: rgba(255, 255, 255, 0.01);
+                    border-radius: 10px;
+                    display: flex;
+                    /* flex-direction: column; */
+                    align-items: center;
+                    gap: 15px;
+                    padding: 1.5em;
+
+                    .input-box {
+                        width: 100%;
+                        display: flex;
+                        align-items: center;
+                        border: 1px solid var(--border);
+                        background-color: var(--bg);
+                        padding: 0 12px;
+                        border-radius: 8px;
+                        gap: 10px;
+                        transition: border-color 0.2s;
+
+                        &:focus-within {
+                            border-color: var(--confirm);
+                        }
+
+                        label {
+                            font-size: 14px;
+                            color: var(--text-muted);
+                            white-space: nowrap;
+                        }
+
+                        input {
+                            width: 100%;
+                            background: transparent;
+                            border: none;
+                            outline: none;
+                            color: var(--text);
+                            padding: 12px 0;
+                            font-size: 14px;
+                        }
+                    }
+                }
             }
         }
     }
