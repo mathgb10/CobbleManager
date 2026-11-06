@@ -18,6 +18,7 @@ from pydantic import BaseModel
 # Docker
 import docker
 
+
 # Inicializa o cliente do Docker (ele conversa automaticamente com o Docker Desktop no Windows/Linux/Mac)
 try:
     docker_client = docker.from_env()
@@ -42,6 +43,7 @@ async def health():
         "status":"ok"
     }
 
+# Tela de Login
 @app.get("/login")
 def login_page(request: Request):
     if "usuario" in request.session:
@@ -49,6 +51,7 @@ def login_page(request: Request):
         
     return FileResponse(path=BASE_DIR / "static/login.html")
 
+# Tela de Dashboard
 @app.get("/dashboard")
 def dashboard_page(request: Request):
     if "usuario" not in request.session:

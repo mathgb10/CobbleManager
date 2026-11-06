@@ -163,45 +163,15 @@ function setSidebar(v1, v2, v3) {
     places.max_players.innerHTML = v3
 }
 
-// Coloco na tela as informações de acordo com a tela
-async function setScreen(tela) {
+// Adiciono os dados em seus placeholders
+async function setContent(tela) {
     const data = await getInfos('status');
+
+    // Chamo a função que adicionara alguns valores a certos placeholders na sidebar
+    setSidebar(data.dominio, data.jogadores.atual, data.jogadores.max)
+
     switch (tela) {
         case 'dashboard':
-            document.querySelector(".content").innerHTML = `
-                <div class="cards">
-                    <div class="card card-nome">
-                        <h2>Nome</h2>
-                        <span id="nome">...</span>
-                    </div>
-                    <div class="card card-status">
-                        <h2>Status</h2>
-                        <span id="status">...</span>
-                    </div>
-                    <div class="card card-saude">
-                        <h2>Saude</h2>
-                        <span id="saude">...</span>
-                    </div>
-                </div>
-                <div class="hardware-cards">
-                    <div class="card grafico" style="width: 48%;">
-                        <h2>RAM</h2>
-                        <canvas id="ramChart"></canvas>
-                    </div>
-                    <div class="card grafico" style="width: 48%;">
-                        <h2>CPU</h2>
-                        <canvas id="cpuChart"></canvas>
-                    </div>
-                </div>
-                <div class="logs-box card">
-                    <div class="logs-header">
-                        <h2>Últimos Logs</h2>
-                    </div>
-                    <div class="logs-card" id="logs">
-                        ...
-                    </div>
-                </div>
-            `
             const places = {
                 //Header
                 header: document.getElementById("pagina"),
@@ -239,18 +209,95 @@ async function setScreen(tela) {
                 places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
             });
             break;
+
         default:
             break;
     }
-
-    // Chamo a função que adicionara alguns valores a certos placeholders na sidebar
-    setSidebar(data.dominio, data.jogadores.atual, data.jogadores.max)
 }
 
-// Atualiza a tela com as informações
-setInterval(() => setScreen('dashboard'), 5000);
-setScreen('dashboard');
+// Preparo a tela (placeholders para os dados)
+async function setScreen(tela) {
+    switch (tela) {
+        case 'dashboard':
+            // Header
+            document.getElementById("pagina").innerHTML = tela;
+            document.querySelector(".content").innerHTML = `
+                <div class="cards">
+                    <div class="card card-nome">
+                        <h2>Nome</h2>
+                        <span id="nome">...</span>
+                    </div>
+                    <div class="card card-status">
+                        <h2>Status</h2>
+                        <span id="status">...</span>
+                    </div>
+                    <div class="card card-saude">
+                        <h2>Saude</h2>
+                        <span id="saude">...</span>
+                    </div>
+                </div>
+                <div class="hardware-cards">
+                    <div class="card grafico" style="width: 48%;">
+                        <h2>RAM</h2>
+                        <canvas id="ramChart"></canvas>
+                    </div>
+                    <div class="card grafico" style="width: 48%;">
+                        <h2>CPU</h2>
+                        <canvas id="cpuChart"></canvas>
+                    </div>
+                </div>
+                <div class="logs-box card">
+                    <div class="logs-header">
+                        <h2>Últimos Logs</h2>
+                    </div>
+                    <div class="logs-card" id="logs">
+                        ...
+                    </div>
+                </div>
+            `
+            break;
+        default:
+            break;
+    }
+}
 
-// Atualiza o relógio a cada 1000ms (1 segundo)
-setInterval(atualizarRelogio, 1000);
-atualizarRelogio();
+let intervalo = null;
+function getRoute() {
+    const url = new URLSearchParams(window.location.search);
+    const tela = url.get('screen') || 'dashboard';
+
+    const btns = document.querySelectorAll(".link")
+    var tela1;
+
+    btns.forEach(e => {
+        const conteudo = e.getAttribute("data-links").toLowerCase();
+        if (conteudo == tela) {
+            e.classList.add("ativo");
+            tela1 = conteudo;
+        } else {
+            e.classList.remove("ativo");
+        };
+    });
+    console.log(tela1);
+    setScreen(tela1);
+    setContent(tela1);
+
+    if (intervalo) clearInterval(intervalo);
+    intervalo = setInterval(() => setContent(tela1), 5000);
+}
+
+document.querySelectorAll('.link').forEach(e => {
+    e.addEventListener('click', () => {
+        const destino = e.getAttribute("data-links").toLowerCase();
+        history.pushState({}, '', `?screen=${destino}`);
+        getRoute(); // Reconfigura para a nova tela
+    });
+});
+
+window.onload = () => {
+    getRoute();
+    // Atualiza o relógio a cada 1000ms (1 segundo)
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
+}
+
