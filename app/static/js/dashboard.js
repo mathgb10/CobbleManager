@@ -216,6 +216,10 @@ async function setContent(tela) {
                 logs: document.getElementById("logs")
             }
 
+            if(places.logs.innerHTML.length > 100){
+                places.logs.innerHTML = null;
+            }
+
             data.logs.forEach(e=>{
                 places.logs.innerHTML =  places.logs.innerHTML += `<p>${e}</p>`;
             })
@@ -285,6 +289,7 @@ async function setScreen(tela) {
                             <label for="comando">></label>
                             <div class="input-box">
                                 <input class="input" type="text" name="comando" id="comando"/>
+                                <button type="submit">Enviar</button>
                             </div>
                         </div>
                     </form>
@@ -334,3 +339,38 @@ window.onload = () => {
     atualizarRelogio();
 }
 
+// Captura o submit de qualquer formulário na página de forma segura
+document.addEventListener("submit", async (e) => {
+    // Se o formulário enviado não for o do comando, ignora
+    if (!e.target.classList.contains("form")) return;
+    
+    e.preventDefault(); // Impede o recarregamento padrão da página
+
+    const inputComando = document.getElementById("comando");
+    if (!inputComando) return;
+
+    const c = inputComando.value.trim();
+    if (!c) return;
+
+    try {
+        const resp = await fetch("/api/server/comando", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ comando: c })
+        });
+
+        if (!resp.ok) {
+            const errorData = await resp.json();
+            alert(errorData.detail);
+            return;
+        }
+
+        // Limpa o input e atualiza os logs na hora
+        inputComando.value = "";
+        setContent('console');
+
+    } catch (error) {
+        console.log("Error: ", error);
+        alert("Erro ao tentar executar comando.");
+    }
+});
