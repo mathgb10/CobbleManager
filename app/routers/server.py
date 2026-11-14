@@ -2,6 +2,7 @@ import os
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, HTTPException
 import docker
+import time
 from datetime import datetime
 from pathlib import Path
 import zipfile
@@ -155,20 +156,19 @@ def backup(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
         container = docker_client.containers.get("cobbleverse")
         container.reload()
 
-        # 1. Força o servidor a salvar o mundo na RAM para o disco
-        try:
-            container.exec_run("rcon-cli save-all")
-        except Exception:
-            pass
+        # Envio uma mensagem alertando aos jogadores que será realizado um Backup do servidor
+        container.exec_run('rcon-cli say §c[Painel] §eO servidor vai fazer backup daqui 1min!')
+        time.sleep(60)
+        # Salva o mundo
+        container.exec_run("rcon-cli save-all")
 
-        # 2. Garante que a pasta de backups existe
         BKP_DIR.mkdir(parents=True, exist_ok=True)
 
-        # 3. Nome único com data e hora
+        # Nome único com data e hora
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         zip_path = BKP_DIR / f"cobbleverse_backup_{timestamp}.zip"
 
-        # 4. Seleciona apenas o que é essencial para o backup (ignora mods, libs e caches gigantescos)
+        # Seleciona apenas o que é essencial para o backup
         itens_essenciais = [
             "world", 
             "config", 
@@ -181,7 +181,7 @@ def backup(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
             "banned-players.json"
         ]
 
-        # 5. Compacta de forma inteligente e super rápida
+        # Compacta os arquivos
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             for item_nome in itens_essenciais:
                 item_path = DATA_DIR / item_nome

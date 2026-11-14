@@ -394,13 +394,20 @@ button {
                 }
             }
 
+            #backup {
+                i {
+                    color: #0e82c5;
+                }
+            }
+
             i {
                 font-size: 18px;
             }
 
             #parar:hover,
             #iniciar:hover,
-            #reiniciar:hover {
+            #reiniciar:hover,
+            #backup:hover {
                 background: rgba(255, 255, 255, 0.05);
                 color: var(--text);
                 border-color: var(--confirm);

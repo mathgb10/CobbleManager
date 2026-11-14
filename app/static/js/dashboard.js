@@ -310,6 +310,9 @@ async function setScreen(tela) {
                     <button id="reiniciar" onclick="action('reiniciar')" class="btn-action">
                         <i class="bi bi-arrow-repeat"></i> Reiniciar
                     </button>
+                    <button id="backup" onclick="action('backup')" class="btn-action">
+                        <i class="bi bi-cloud-arrow-up"></i> Backup
+                    </button>
                 </div>
             `;
             break;
@@ -359,7 +362,6 @@ window.onload = () => {
 
 async function action(x) {
     const acao = x; // Vai retornar 'iniciar', 'parar' ou 'reiniciar'
-    console.log("Ação clicada:", acao);
 
     // Aqui você pode direcionar para a API correspondente com base no ID:
     try {
@@ -367,6 +369,7 @@ async function action(x) {
         if (acao === "parar") endpoint = "/api/server/stop";
         if (acao === "reiniciar") endpoint = "/api/server/restart";
         if (acao === "iniciar") endpoint = "/api/server/start"; // (caso crie a rota depois)
+        if (acao === "backup") endpoint = "/api/server/bkp"; // (caso crie a rota depois)
 
         if (!endpoint) return;
 
