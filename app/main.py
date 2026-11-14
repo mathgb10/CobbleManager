@@ -35,12 +35,15 @@ app.mount("/static",StaticFiles(directory="app/static",html=True),name="static")
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# Status da API
-@app.get("/api/status")
-async def health():
-    return{
-        "status":"ok"
-    }
+# Válida se o usuário está logado
+def verificar_login(request: Request):
+    if "usuario" not in request.session:
+        raise HTTPException(status_code=401, detail="Não autorizado.")
+
+# Válida se o Docker está rodando
+def verifica_docker():
+    if docker_client is None:
+        raise HTTPException(status_code=500, detail="Cliente do Docker não disponível.")
 
 # Tela de Login
 @app.get("/login")
@@ -75,7 +78,6 @@ class Login(BaseModel):
 # Login
 @app.post("/api/auth/login")
 async def login(usuario:Login, request: Request):
-    
     # Valores esperados
     usuario_esp = os.getenv("ADMIN_USERNAME")
     senha_esp = os.getenv("ADMIN_PASSWORD")
@@ -109,13 +111,7 @@ async def logout(request: Request):
 
 # Todos os dados do container - TEMPORARIO
 @app.get("/api/server/tmp")
-def server_status(request: Request):
-    if "usuario" not in request.session:
-        raise HTTPException(status_code=401, detail="Não autorizado.")
-
-    if docker_client is None:
-        raise HTTPException(status_code=500, detail="Cliente do Docker não disponível.")
-
+def server_status(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
         container = docker_client.containers.get("cobbleverse")
         container.reload()
@@ -136,13 +132,7 @@ def server_status(request: Request):
     
 # Status do servidor
 @app.get("/api/server/status")
-def server_status(request: Request):
-    if "usuario" not in request.session:
-        raise HTTPException(status_code=401, detail="Não autorizado.")
-
-    if docker_client is None:
-        raise HTTPException(status_code=500, detail="Cliente do Docker não disponível.")
-
+def server_status(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
         # Escolho o container
         container = docker_client.containers.get("cobbleverse")
@@ -234,13 +224,7 @@ class Comando(BaseModel):
     comando: str
 
 @app.post("/api/server/comando")
-def enviar_comando(json: Comando, request: Request):
-    if "usuario" not in request.session:
-        raise HTTPException(status_code=401, detail="Não autorizado.")
-
-    if docker_client is None:
-        raise HTTPException(status_code=500, detail="Cliente do Docker não disponível.")
-
+def enviar_comando(json: Comando, _ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
         container = docker_client.containers.get("cobbleverse")
         container.reload()
@@ -257,13 +241,7 @@ def enviar_comando(json: Comando, request: Request):
         raise HTTPException(status_code=500, detail=f"Erro ao enviar comando para o Docker: {str(e)}")
 
 @app.get("/api/server/logs")
-def terminal(request: Request):
-    if "usuario" not in request.session:
-        raise HTTPException(status_code=401, detail="Não autorizado.")
-
-    if docker_client is None:
-        raise HTTPException(status_code=500,detail="Cliente do Docker não disponível.")
-
+def terminal(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
         # Escolho o container
         container = docker_client.containers.get("cobbleverse")
@@ -275,4 +253,30 @@ def terminal(request: Request):
         }
     except Exception as e:
         raise HTTPException(status_code=500,detail="Erro ao consultar logs")
+
     
+@app.post("/api/server/stop")
+def parar_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
+    try:
+        container = docker_client.containers.get("cobbleverse")
+        container.stop()
+
+        return {
+            "sucesso": True,
+            "msg": "O Container foi parado com suceosso"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=f"Não foi possível parar o container, erro:${e}")
+
+@app.post("/api/server/start")
+def iniciar_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
+    try:
+        container = docker_client.containers.get("cobbleverse")
+        container.start()
+
+        return {
+            "sucesso": True,
+            "msg": "O Container foi iniciado com suceosso"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=f"Não foi possível iniciar o container, erro:${e}")
