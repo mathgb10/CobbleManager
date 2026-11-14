@@ -353,31 +353,57 @@ button {
             }
         }
 
-        .btns-header{
+        .btns-header {
             display: flex;
             width: 100%;
             flex-wrap: wrap;
             gap: 10px;
 
-            .btn-action{
+            .btn-action {
                 display: flex;
                 flex: 1;
-                border: none;
+                border: 1px solid var(--border);
                 padding: 10px;
                 color: rgba(0, 0, 0, 0.5);
-                font-size: 1.2em;
+                background: transparent;
+                color: var(--text-muted);
+                font-size: 15px;
             }
 
-            #parar{
-                background-color: var(--cancel);
+            #parar {
+                /* border-color: var(--cancel); */
+
+                i {
+                    color: var(--cancel);
+                }
             }
 
-            #iniciar{
-                background-color: var(--confirm);
+            #iniciar {
+                /* border-color: var(--confirm); */
+
+                i {
+                    color: var(--confirm);
+                }
             }
 
-            #reiniciar{
-                background-color: var(--principal);
+            #reiniciar {
+                /* border-color: var(--principal); */
+
+                i {
+                    color: var(--principal);
+                }
+            }
+
+            i {
+                font-size: 18px;
+            }
+
+            #parar:hover,
+            #iniciar:hover,
+            #reiniciar:hover {
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text);
+                border-color: var(--confirm);
             }
         }
 
