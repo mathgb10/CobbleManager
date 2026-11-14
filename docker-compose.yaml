@@ -8,6 +8,8 @@ services:
     volumes:
       - ./app:/app/app
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${DATA_SERVER}:/data
+      - ./data/backups:/backups
     env_file:
       - .env
     networks:

@@ -1,24 +1,19 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException
 import docker
+from datetime import datetime
+from pathlib import Path
+import zipfile
 from app.dependencies import verificar_login, verifica_docker, docker_client
 
 router = APIRouter(prefix="/api/server", tags=["Servidor Minecraft"])
 
+DATA_DIR = Path("/data")
+BKP_DIR = Path("/backups")
+
 class Comando(BaseModel):
     comando: str
-
-@router.get("/tmp")
-def server_tmp(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
-    try:
-        container = docker_client.containers.get("cobbleverse")
-        container.reload()
-        return {"data": container.attrs}
-    except docker.errors.NotFound:
-        return {"status": "not_found", "message": "Container não encontrado."}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/status")
 def server_status(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
@@ -158,6 +153,50 @@ def restart_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker
 def backup(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
         container = docker_client.containers.get("cobbleverse")
-        return {"sucesso": True, "msg": "Backup pendente"}
+        container.reload()
+
+        # 1. Força o servidor a salvar o mundo na RAM para o disco
+        try:
+            container.exec_run("rcon-cli save-all")
+        except Exception:
+            pass
+
+        # 2. Garante que a pasta de backups existe
+        BKP_DIR.mkdir(parents=True, exist_ok=True)
+
+        # 3. Nome único com data e hora
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        zip_path = BKP_DIR / f"cobbleverse_backup_{timestamp}.zip"
+
+        # 4. Seleciona apenas o que é essencial para o backup (ignora mods, libs e caches gigantescos)
+        itens_essenciais = [
+            "world", 
+            "config", 
+            "datapacks", 
+            "server.properties", 
+            "ops.json", 
+            "whitelist.json", 
+            "usercache.json",
+            "banned-ips.json",
+            "banned-players.json"
+        ]
+
+        # 5. Compacta de forma inteligente e super rápida
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for item_nome in itens_essenciais:
+                item_path = DATA_DIR / item_nome
+                if item_path.is_dir():
+                    for subfile in item_path.rglob("*"):
+                        if subfile.is_file():
+                            zipf.write(subfile, subfile.relative_to(DATA_DIR))
+                elif item_path.is_file():
+                    zipf.write(item_path, item_path.relative_to(DATA_DIR))
+
+        return {
+            "sucesso": True,
+            "msg": "Backup gerado com sucesso!",
+            "arquivo": f"data/backups/cobbleverse_backup_{timestamp}.zip"
+        }
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Não foi possível fazer o backup do container, erro:${e}")
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar backup: {str(e)}")
