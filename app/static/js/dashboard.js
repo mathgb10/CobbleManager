@@ -216,14 +216,14 @@ async function setContent(tela) {
                 logs: document.getElementById("logs")
             }
 
-            if(places.logs.innerHTML.length > 100){
+            if (places.logs.innerHTML.length > 100) {
                 places.logs.innerHTML = null;
             }
 
-            data.logs.forEach(e=>{
-                places.logs.innerHTML =  places.logs.innerHTML += `<p>${e}</p>`;
+            data.logs.forEach(e => {
+                places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
             })
-            
+
             break;
         default:
             break;
@@ -294,7 +294,25 @@ async function setScreen(tela) {
                         </div>
                     </form>
                 </div>
-            `
+            `;
+            break;
+        case 'painel':
+            // Header
+            document.getElementById("pagina").innerHTML = tela;
+            document.querySelector(".content").innerHTML = `
+                <div class="btns-header">
+                    <button id="iniciar" onclick="action('iniciar')" class="btn-action">
+                        <i class="bi bi-play-fill"></i> Iniciar
+                    </button>
+                    <button id="parar" onclick="action('parar')" class="btn-action">
+                        <i class="bi bi-stop-fill"></i> Parar
+                    </button>
+                    <button id="reiniciar" onclick="action('reiniciar')" class="btn-action">
+                        <i class="bi bi-arrow-repeat"></i> Reiniciar
+                    </button>
+                </div>
+            `;
+            break;
         default:
             break;
     }
@@ -339,11 +357,39 @@ window.onload = () => {
     atualizarRelogio();
 }
 
+async function action(x) {
+    const acao = x; // Vai retornar 'iniciar', 'parar' ou 'reiniciar'
+    console.log("Ação clicada:", acao);
+
+    // Aqui você pode direcionar para a API correspondente com base no ID:
+    try {
+        let endpoint = "";
+        if (acao === "parar") endpoint = "/api/server/stop";
+        if (acao === "reiniciar") endpoint = "/api/server/restart";
+        if (acao === "iniciar") endpoint = "/api/server/start"; // (caso crie a rota depois)
+
+        if (!endpoint) return;
+
+        const resp = await fetch(endpoint, { method: 'POST' });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            alert(data.detail || "Erro ao executar ação.");
+            return;
+        }
+
+        alert(data.msg || "Ação executada com sucesso!");
+    } catch (error) {
+        console.log("Erro: ", error);
+        alert("Erro ao tentar comunicar com o servidor.");
+    }
+}
+
 // Captura o submit de qualquer formulário na página de forma segura
 document.addEventListener("submit", async (e) => {
     // Se o formulário enviado não for o do comando, ignora
     if (!e.target.classList.contains("form")) return;
-    
+
     e.preventDefault(); // Impede o recarregamento padrão da página
 
     const inputComando = document.getElementById("comando");

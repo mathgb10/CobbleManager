@@ -353,6 +353,34 @@ button {
             }
         }
 
+        .btns-header{
+            display: flex;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            .btn-action{
+                display: flex;
+                flex: 1;
+                border: none;
+                padding: 10px;
+                color: rgba(0, 0, 0, 0.5);
+                font-size: 1.2em;
+            }
+
+            #parar{
+                background-color: var(--cancel);
+            }
+
+            #iniciar{
+                background-color: var(--confirm);
+            }
+
+            #reiniciar{
+                background-color: var(--principal);
+            }
+        }
+
         .terminal {
             height: 90vh;
 
@@ -400,6 +428,12 @@ button {
                             color: var(--text);
                             padding: 12px 0;
                             font-size: 14px;
+                        }
+
+                        button {
+                            border: none;
+                            background: var(--confirm);
+                            color: rgba(0, 0, 0, 0.5);
                         }
                     }
                 }
