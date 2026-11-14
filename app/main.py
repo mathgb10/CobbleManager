@@ -254,7 +254,7 @@ def terminal(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     except Exception as e:
         raise HTTPException(status_code=500,detail="Erro ao consultar logs")
 
-    
+# Para o container
 @app.post("/api/server/stop")
 def parar_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
@@ -263,11 +263,12 @@ def parar_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker))
 
         return {
             "sucesso": True,
-            "msg": "O Container foi parado com suceosso"
+            "msg": "O Container foi parado com sucesso"
         }
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Não foi possível parar o container, erro:${e}")
 
+# Incia o container
 @app.post("/api/server/start")
 def iniciar_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
     try:
@@ -276,7 +277,21 @@ def iniciar_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker
 
         return {
             "sucesso": True,
-            "msg": "O Container foi iniciado com suceosso"
+            "msg": "O Container foi iniciado com sucesso"
         }
     except Exception as e:
         raise HTTPException(status_code=500,detail=f"Não foi possível iniciar o container, erro:${e}")
+
+# Reinica o container
+@app.post("/api/server/restart")
+def restart_container(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
+    try:
+        container = docker_client.containers.get("cobbleverse")
+        container.restart()
+
+        return {
+            "sucesso": True,
+            "msg": "O Container foi reinicado com sucesso"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500,detail=f"Não foi possível reiniciar o container, erro:${e}")
