@@ -51,7 +51,8 @@ def principal(request: Request):
     else:
         return RedirectResponse(url="/login",status_code=status.HTTP_303_SEE_OTHER)
 
-from app.routers import auth, server
+from app.routers import auth, server, players
 
 app.include_router(auth.router)
 app.include_router(server.router)
+app.include_router(players.router)

@@ -209,6 +209,28 @@ async function setContent(tela) {
                 places.logs.innerHTML = places.logs.innerHTML += `<p>${e}</p>`;
             });
             break;
+        case 'painel':
+            data = await getInfos('players');
+
+            const players = data.dados;
+
+            var places = {
+                tabela: document.getElementById("players-table")
+            }
+
+            places.tabela.innerHTML = null;
+
+            players.forEach(e => {
+                let skin = fetch(`https://crafthead.net/avatar/{e.uuid}`)
+                places.tabela.innerHTML += `
+                    <tr>
+                        <td><img src="${e.skin}" alt="Skin" width="32" height="32"></td>
+                        <td>${e.name}</td>
+                        <td>${e.uuid}</td>
+                    </tr>
+                `
+            });
+            break;
         case 'console':
             data = await getInfos('logs')
             var places = {
@@ -314,6 +336,24 @@ async function setScreen(tela) {
                         <i class="bi bi-cloud-arrow-up"></i> Backup
                     </button>
                 </div>
+                <div>
+                    <div>
+                        <table>
+                            <thead>
+                                <th>Skin</th>
+                                <th>Nick</th>
+                                <th>UID</th>
+                            </thead>
+                            <tbody id="players-table">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+
+                    </div>
+                </div>
+
             `;
             break;
         default:
