@@ -163,6 +163,9 @@ function setSidebar(v1, v2, v3) {
     places.max_players.innerHTML = v3
 }
 
+
+let pesquisa = null;
+
 // Adiciono os dados em seus placeholders
 async function setContent(tela) {
     let data;
@@ -221,15 +224,26 @@ async function setContent(tela) {
             places.tabela.innerHTML = null;
 
             players.forEach(e => {
-                let skin = fetch(`https://crafthead.net/avatar/{e.uuid}`)
                 places.tabela.innerHTML += `
                     <tr>
                         <td><img src="${e.skin}" alt="Skin" width="32" height="32"></td>
-                        <td>${e.name}</td>
-                        <td>${e.uuid}</td>
+                        <td class="name">${e.name}</td>
+                        <td title='${e.uuid}'>${e.uuid.substring(0, 8)}...</td>
+                        <td><button>Gerenciar</button></td>
                     </tr>
                 `
             });
+
+            if (pesquisa) {
+                const linhas = document.querySelectorAll("#players-table tr");
+                linhas.forEach(linha => {
+                    const nomeTd = linha.querySelector(".name");
+                    if (!nomeTd) return;
+                    const nome = nomeTd.textContent.toLowerCase();
+                    linha.style.display = nome.includes(pesquisa) ? "" : "none";
+                });
+            }
+
             break;
         case 'console':
             data = await getInfos('logs')
@@ -337,24 +351,59 @@ async function setScreen(tela) {
                     </button>
                 </div>
                 <div>
-                    <div>
-                        <table>
-                            <thead>
-                                <th>Skin</th>
-                                <th>Nick</th>
-                                <th>UID</th>
-                            </thead>
-                            <tbody id="players-table">
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-
+                    <div class="logs-box sem-min terminal card">
+                        <div class="logs-header">
+                            <h2>Players</h2>
+                        </div>
+                        <form class="form">
+                            <div class="body-form">
+                                <label for="player"><i class="bi bi-search"></i></label>
+                                <div class="input-box">
+                                    <input type="text" placeholder="Digite o nick de um jogador..." name="player" id="player">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="overflow">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Skin</th>
+                                        <th>Nick</th>
+                                        <th>UID</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="players-table">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-
             `;
+
+            const inputPlayer = document.getElementById("player");
+            if (inputPlayer) {
+                // Se já tinha algo digitado antes, mantém no input
+                if (pesquisa) inputPlayer.value = pesquisa;
+
+                inputPlayer.addEventListener("input", async (e) => {
+                    const termo = e.target.value.toLowerCase();
+                    pesquisa = termo; // Salva na global
+
+                    const linhas = document.querySelectorAll("#players-table tr");
+                    linhas.forEach(linha => {
+                        const nomeTd = linha.querySelector(".name");
+                        if (!nomeTd) return;
+
+                        const nome = nomeTd.textContent.toLowerCase();
+                        if (nome.includes(termo)) {
+                            linha.style.display = ""; // Mostra
+                        } else {
+                            linha.style.display = "none"; // Esconde
+                        }
+                    });
+                });
+            }
             break;
         default:
             break;
@@ -427,6 +476,7 @@ async function action(x) {
         alert("Erro ao tentar comunicar com o servidor.");
     }
 }
+
 
 // Captura o submit de qualquer formulário na página de forma segura
 document.addEventListener("submit", async (e) => {
