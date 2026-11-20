@@ -239,7 +239,7 @@ async function setContent(tela) {
                         <td><img src="${e.skin}" alt="Skin" width="32" height="32"></td>
                         <td class="name">${e.name}</td>
                         <td title='${e.uuid}'>${e.uuid.substring(0, 8)}...</td>
-                        <td><button>Gerenciar</button></td>
+                        
                     </tr>
                 `
             });
@@ -389,7 +389,7 @@ async function setScreen(tela) {
                                         <th>Skin</th>
                                         <th>Nick</th>
                                         <th>UID</th>
-                                        <th>Ações</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody id="players-table">
@@ -404,7 +404,7 @@ async function setScreen(tela) {
                             <h2>Server Properties</h2>
                         </div>
                         <form class="form properties-form" id="form-properties">
-                            <div class="body-form">
+                            <div class="body-form" style="border: none;background: transparent;">
                                 <div class="input-box">
                                     <textarea class="input" name="properties" id="server-properties"></textarea>
                                 </div>
