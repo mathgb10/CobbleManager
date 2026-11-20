@@ -523,5 +523,9 @@ button {
                 border-color: var(--confirm);
             }
         }
+
+        #op-btn {
+            cursor: pointer;
+        }
     }
 }

@@ -222,10 +222,15 @@ async function setContent(tela) {
             }
 
             places.tabela.innerHTML = null;
-            
+
             players.forEach(e => {
                 var op = e.op == true ? true : false;
-                op == true ? op = "<img src='/static/assets/coroa.png' alt='Coroa' width='32' height='32'>" : op = "<span> </span>";
+                op == true ? (
+                    op = `<img src='/static/assets/coroa.png' alt='Coroa' width='32' height='32' id='op-btn' onclick='alterarOp("${e.name}",${Boolean(!e.op)})'>`
+                ) : (
+                    op = `<img src='/static/assets/coroa.png' alt='Coroa' width='32' height='32' style='filter:grayscale(100%)' id='op-btn' onclick='alterarOp("${e.name}",${Boolean(!e.op)})'>`
+
+                );
 
                 places.tabela.innerHTML += `
                     <tr>
@@ -478,6 +483,32 @@ async function action(x) {
         alert(data.msg || "Ação executada com sucesso!");
     } catch (error) {
         console.log("Erro: ", error);
+        alert("Erro ao tentar comunicar com o servidor.");
+    }
+}
+
+async function alterarOp(nick, op) {
+    try {
+        const resp = await fetch("/api/server/players/op", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: nick,
+                op: op
+            })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            alert(data.detail || "Erro ao alterar permissão.");
+            return;
+        }
+
+        // Atualiza a tabela imediatamente para refletir a coroa e o botão
+        setContent("painel");
+    } catch (error) {
+        console.log("Erro:", error);
         alert("Erro ao tentar comunicar com o servidor.");
     }
 }
