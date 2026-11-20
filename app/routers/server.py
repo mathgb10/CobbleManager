@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 import zipfile
+import json
 from app.dependencies import verificar_login, verifica_docker, docker_client
 
 router = APIRouter(prefix="/api/server", tags=["Servidor Minecraft"])
@@ -200,3 +201,30 @@ def backup(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao gerar backup: {str(e)}")
+
+@router.get("/properties")
+def propriedades(_ = Depends(verificar_login), _1 = Depends(verifica_docker)):
+    try:
+        caminho = DATA_DIR / "server.properties"
+        itens = []
+
+        with open(caminho, "r", encoding="utf-8") as arq:
+            for linha in arq:
+                linha_limpa = linha.strip()
+                # Ignora comentários e linhas vazias
+                if not linha_limpa or linha_limpa.startswith("#") or "=" not in linha_limpa:
+                    continue
+
+                chave, valor = linha_limpa.split("=", 1)
+                itens.append({
+                    "chave": chave.strip(),
+                    "valor": valor.strip()
+                })
+
+        return {
+            "sucesso": True,
+            "propriedades": itens
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao consultar server.properties, erro: {str(e)}")

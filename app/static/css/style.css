@@ -92,7 +92,7 @@ button {
                 white-space: nowrap;
             }
 
-            input {
+            input, textarea {
                 width: 100%;
                 background: transparent;
                 border: none;
@@ -468,6 +468,56 @@ button {
                             background: var(--confirm);
                             color: rgba(0, 0, 0, 0.5);
                         }
+                    }
+                }
+
+                &.properties-form {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+
+                    .body-form {
+                        width: 100%;
+
+                        .input-box {
+                            align-items: stretch;
+                            padding: 0;
+                            overflow: hidden;
+
+                            textarea {
+                                width: 100%;
+                                min-height: 350px;
+                                resize: vertical;
+                                background: transparent;
+                                border: none;
+                                outline: none;
+                                color: var(--text);
+                                padding: 12px;
+                                font-family: Arial, Helvetica, sans-serif;
+                                font-size: 14px;
+                                line-height: 1.5;
+                            }
+                        }
+                    }
+
+                    .btn-action {
+                        width: 100%;
+                        min-height: 44px;
+                        border: none;
+                        border-radius: 8px;
+                        background: var(--confirm);
+                        color: rgba(0, 0, 0, 0.5);
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        padding: 12px;
+                        font-family: Arial, Helvetica, sans-serif;
+                        font-size: 14px;
+                    }
+
+                    .btn-action:hover {
+                        background: var(--confirm);
+                        filter: brightness(0.9);
                     }
                 }
             }

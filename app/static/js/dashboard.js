@@ -218,7 +218,8 @@ async function setContent(tela) {
             const players = data.dados;
 
             var places = {
-                tabela: document.getElementById("players-table")
+                tabela: document.getElementById("players-table"),
+                propriedades: document.getElementById("server-properties")
             }
 
             places.tabela.innerHTML = null;
@@ -252,6 +253,14 @@ async function setContent(tela) {
                     linha.style.display = nome.includes(pesquisa) ? "" : "none";
                 });
             }
+
+            if (places.propriedades.value == "") {
+                data2 = await getInfos("properties");
+                places.propriedades.value = data2.propriedades
+                    .map(i => `${i.chave}=${i.valor}`)
+                    .join("\n")
+            }
+            
 
             break;
         case 'console':
@@ -387,6 +396,23 @@ async function setScreen(tela) {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="logs-box sem-min terminal card">
+                        <div class="logs-header">
+                            <h2>Server Properties</h2>
+                        </div>
+                        <form class="form properties-form" id="form-properties">
+                            <div class="body-form">
+                                <div class="input-box">
+                                    <textarea class="input" name="properties" id="server-properties"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-action">
+                                <i class="bi bi-floppy"></i> Salvar
+                            </button>
+                        </form>
                     </div>
                 </div>
             `;
