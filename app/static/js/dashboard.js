@@ -222,10 +222,14 @@ async function setContent(tela) {
             }
 
             places.tabela.innerHTML = null;
-
+            
             players.forEach(e => {
+                var op = e.op == true ? true : false;
+                op == true ? op = "<img src='/static/assets/coroa.png' alt='Coroa' width='32' height='32'>" : op = "<span> </span>";
+
                 places.tabela.innerHTML += `
                     <tr>
+                        <td>${op}</td>
                         <td><img src="${e.skin}" alt="Skin" width="32" height="32"></td>
                         <td class="name">${e.name}</td>
                         <td title='${e.uuid}'>${e.uuid.substring(0, 8)}...</td>
@@ -367,6 +371,7 @@ async function setScreen(tela) {
                             <table>
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>Skin</th>
                                         <th>Nick</th>
                                         <th>UID</th>
